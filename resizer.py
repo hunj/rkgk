@@ -3,10 +3,6 @@ from PIL import Image, ImageFilter
 import argparse
 
 
-def _ratio(image):
-    return image.height / image.width
-
-
 def square_img(image_path):
     print(image_path)
     filename = "".join(image_path.split('.')[:-1])
@@ -14,7 +10,7 @@ def square_img(image_path):
 
     original_image = Image.open(image_path)
     exif_data = original_image.info.get('exif')
-    ratio = _ratio(original_image)
+    ratio = original_image.height / original_image.width
 
     if ratio < 1:
         return
@@ -29,7 +25,7 @@ def square_img(image_path):
     crop_box = (0, length_to_crop, result_image.width, result_image.height - length_to_crop)
     result_image = result_image.crop(crop_box).filter(ImageFilter.GaussianBlur(radius=round(original_image.height / (ratio * 100))))
 
-    result_image.paste(original_image, (round((original_image.height - original_image.width) / 2 ), 0))
+    result_image.paste(original_image, (round((original_image.height - original_image.width) / 2), 0))
 
     result_image.save(fp=f"{filename}_edit.{extension}", quality=100, exif=exif_data)
 
@@ -45,6 +41,6 @@ if __name__ == "__main__":
                 if image_filename.endswith('.jpg') or image_filename.endswith('.png'):
                     print(image_filename)
                     square_img(os.path.join(image_path, image_filename))
-        elif os.isfile(image_path):
+        elif os.path.isfile(image_path):
             print(image_path)
             square_img(image_path)
