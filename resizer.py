@@ -16,8 +16,7 @@ def square_img(image_path):
     if ratio < 1:
         return
 
-    result_image = original_image.copy()
-    result_image = result_image.rotate(90)
+    result_image = original_image.copy().rotate(90)
 
     zoomed_size = (round(original_image.width * ratio), round(original_image.height * ratio))
     result_image = original_image.resize(size=zoomed_size)
