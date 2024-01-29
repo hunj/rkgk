@@ -9,6 +9,7 @@ def square_img(image_path):
     extension = image_path.split('.')[-1]
 
     original_image = Image.open(image_path)
+    icc_profile = original_image.info.get('icc_profile')
     exif_data = original_image.info.get('exif')
     ratio = original_image.height / original_image.width
 
@@ -27,7 +28,7 @@ def square_img(image_path):
 
     result_image.paste(original_image, (round((original_image.height - original_image.width) / 2), 0))
 
-    result_image.save(fp=f"{filename}_edit.{extension}", quality=100, exif=exif_data)
+    result_image.save(fp=f"{filename}_edit.{extension}", quality=100, exif=exif_data, icc_profile=bytes(icc_profile))
 
 
 if __name__ == "__main__":
