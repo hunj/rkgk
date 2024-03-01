@@ -17,11 +17,9 @@ def blur_background(image_path, format="square", background="blur", blur_radius=
 
     # determine new image's dimensions
     long_side = max(original_image.width, original_image.height)
-    short_side = min(original_image.width, original_image.height)
-
     if format == "square":
         zoomed_size = (long_side, long_side)
-    elif format == "portrait":  # 4:5 ratio
+    elif format == "portrait":  # 4:5 ratio for instagram
         r = long_side // 5
         zoomed_size = (r * 4, r * 5)
     else:
@@ -45,21 +43,19 @@ def blur_background(image_path, format="square", background="blur", blur_radius=
 
     result_image.paste(original_image, box=paste_box)
 
-    # crop out if needed
-    if format == "portrait":  # 4:5 portrait for instagram
-        width_to_crop = result_image.width / 10
-        width_crop_box = (width_to_crop, 0, result_image.width - width_to_crop, result_image.height)
-        result_image = result_image.crop(width_crop_box)
-
     result_image.save(fp=f"{filename}_edit.{extension}", quality=100, exif=exif_data, icc_profile=bytes(icc_profile))
 
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument('images', metavar='I', nargs='+', type=str, help='path to images')
-    # parser.add_argument('format', metavar='F', action='store', help='format, default is square', default='square')
-    # parser.add_argument('background', metavar='B', action='store', help='background color, default is blur', default='blur')
+    parser.add_argument('-b', '--black', action='store_true')
+    parser.add_argument('-s', '--square', action='store_true', help='format, default is square')
+    parser.add_argument('-r', '--radius', type=int, default=32)
     args = parser.parse_args()
+
+    format = "square" if args.square else "portrait"
+    background = "black" if args.black else "blur"
 
     for image_path in args.images:
         if os.path.isdir(image_path):
@@ -67,6 +63,16 @@ if __name__ == "__main__":
                 if '_edit.' in image_filename:
                     continue
                 elif image_filename.endswith('.jpg') or image_filename.endswith('.png'):
-                    blur_background(os.path.join(image_path, image_filename))
+                    blur_background(
+                        os.path.join(image_path, image_filename),
+                        format=format,
+                        background=background,
+                        blur_radius=args.radius,
+                    )
         elif os.path.isfile(image_path):
-            blur_background(image_path)
+            blur_background(
+                image_path,
+                format=format,
+                background=background,
+                blur_radius=args.radius,
+            )
