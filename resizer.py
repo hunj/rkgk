@@ -15,6 +15,15 @@ def blur_background(image_path, format="square", background="blur", blur_radius=
     exif_data = original_image.info.get('exif')
     ratio = original_image.height / original_image.width
 
+    save_info = {
+        "fp": f"{filename}_edit.{extension}",
+        "quality": 100,
+        "exif": exif_data,
+    }
+
+    if icc_profile:
+        save_info["icc_profile"] = icc_profile
+
     # determine new image's dimensions
     long_side = max(original_image.width, original_image.height)
     if format == "square":
@@ -43,8 +52,7 @@ def blur_background(image_path, format="square", background="blur", blur_radius=
 
     result_image.paste(original_image, box=paste_box)
 
-    result_image.save(fp=f"{filename}_edit.{extension}", quality=100, exif=exif_data, icc_profile=bytes(icc_profile))
-
+    result_image.save(**save_info)
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
