@@ -18,18 +18,18 @@ def blur_background(image_path, format="square", background="blur", blur_radius=
     # determine new image's dimensions
     long_side = max(original_image.width, original_image.height)
     if format == "square":
-        zoomed_size = (long_side, long_side)
+        background_size = (long_side, long_side)
     elif format == "portrait":  # 4:5 ratio for instagram
         r = long_side // 5
-        zoomed_size = (r * 4, r * 5)
+        background_size = (r * 4, r * 5)
     else:
-        zoomed_size = (original_image.width, original_image.height)
+        background_size = (original_image.width, original_image.height)
 
     # set up "background" layer
     if background == "black":
-        result_image = Image.new(mode="RGB", size=zoomed_size, color="black")
+        result_image = Image.new(mode="RGB", size=background_size, color="black")
     elif background == "blur":
-        result_image = original_image.resize(size=zoomed_size)
+        result_image = original_image.resize(size=background_size)
         result_image = result_image.filter(ImageFilter.GaussianBlur(radius=blur_radius))
 
     # paste the original image on top of the bg layer
